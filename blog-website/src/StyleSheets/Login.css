@@ -1,0 +1,35 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--primary-bg);
+}
+
+.login-container h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-text);
+}
+
+.login-container p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--secondary-text);
+}
+
+.google-login-btn {
+  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem;
+  background-color: var(--accent-2);
+  color: var(--secondary-bg);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.google-login-btn:hover {
+  background-color: var(--accent-1);
+}
