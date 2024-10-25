@@ -1,83 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import Navbar from "./Navbar";
 import NewBlogPost from "./NewBlogPost";
 import { useAuth } from "../AuthContext";
 import "../StyleSheets/BlogTopicPage.css";
 
 const API_URL = "http://localhost:5000/api";
-
-const sampleBlogs = {
-  Technology: [
-    {
-      id: 1,
-      title: "The Future of AI",
-      content:
-        "Artificial Intelligence is rapidly evolving, with new breakthroughs happening every day...",
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      title: "5G Revolution",
-      content:
-        "5G networks are set to transform how we connect, offering unprecedented speeds and low latency...",
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      title: "Cybersecurity in 2023",
-      content:
-        "As our world becomes increasingly digital, the importance of robust cybersecurity measures cannot be overstated...",
-      createdAt: new Date(),
-    },
-  ],
-  Science: [
-    {
-      id: 1,
-      title: "Mars Exploration Update",
-      content:
-        "Recent missions to Mars have provided exciting new data about the red planet's geology and potential for sustaining life...",
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      title: "Breakthrough in Quantum Computing",
-      content:
-        "Scientists have achieved a major milestone in quantum computing, paving the way for unprecedented computational power...",
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      title: "The Hunt for Dark Matter",
-      content:
-        "Researchers are employing new techniques in the ongoing search for dark matter, the mysterious substance that makes up a large portion of our universe...",
-      createdAt: new Date(),
-    },
-  ],
-  Art: [
-    {
-      id: 1,
-      title: "Digital Art Revolution",
-      content:
-        "NFTs have taken the art world by storm, offering new opportunities and challenges for artists in the digital age...",
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      title: "Renaissance Masters Exhibition",
-      content:
-        "A new exhibition bringing together works from Leonardo, Michelangelo, and Raphael is set to open next month...",
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      title: "Street Art's Rising Influence",
-      content:
-        "Once considered vandalism, street art is now recognized as a powerful form of cultural expression and social commentary...",
-      createdAt: new Date(),
-    },
-  ],
-};
 
 const BlogTopicPage = () => {
   const { topic } = useParams();
@@ -86,16 +15,35 @@ const BlogTopicPage = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    setBlogs(sampleBlogs[topic] || []);
+    fetchBlogs();
   }, [topic]);
 
-  const addNewBlog = (newBlog) => {
-    const updatedBlogs = [
-      ...blogs,
-      { ...newBlog, id: blogs.length + 1, createdAt: new Date() },
-    ];
-    setBlogs(updatedBlogs);
-    setShowNewPostForm(false);
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/blogs/topic/${topic}`);
+      setBlogs(response.data);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    }
+  };
+
+  const addNewBlog = async (blogData) => {
+    try {
+      await axios.post(
+        `${API_URL}/blogs`,
+        {
+          ...blogData,
+          topic: topic,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      fetchBlogs();
+      setShowNewPostForm(false);
+    } catch (error) {
+      console.error("Error creating blog:", error);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -140,13 +88,14 @@ const BlogTopicPage = () => {
         <div className="blogs-container">
           {blogs.length > 0 ? (
             blogs.map((blog) => (
-              <div key={blog.id} className="blog-box">
+              <div key={blog._id} className="blog-box">
                 <h2>{blog.title}</h2>
                 <p>{blog.content.substring(0, 100)}...</p>
                 <p className="blog-date">
                   Posted on: {formatDate(blog.createdAt)}
                 </p>
-                <a href={`/blog/${blog.id}`} className="read-more">
+                <p className="blog-author">By: {blog.author.displayName}</p>
+                <a href={`/blog/${blog._id}`} className="read-more">
                   Read More
                 </a>
               </div>
