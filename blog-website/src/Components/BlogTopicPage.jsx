@@ -13,6 +13,7 @@ const BlogTopicPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { user } = useAuth();
+  const [summaries, setSummaries] = useState({});
 
   useEffect(() => {
     fetchBlogs();
@@ -57,6 +58,28 @@ const BlogTopicPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const summarizeBlog = async (blogId, content) => {
+    try {
+      const response = await axios.post(`${API_URL}/ai/summarize`, {
+        text: content,
+      });
+      setSummaries((prev) => ({
+        ...prev,
+        [blogId]: response.data.summary,
+      }));
+    } catch (error) {
+      console.error("Error summarizing blog:", error);
+    }
+  };
+
+  const clearSummary = (blogId) => {
+    setSummaries((prev) => {
+      const newSummaries = { ...prev };
+      delete newSummaries[blogId];
+      return newSummaries;
+    });
+  };
+
   return (
     <div className="page-container">
       <Navbar showLoginButton={true} />
@@ -94,10 +117,27 @@ const BlogTopicPage = () => {
                 <p className="blog-date">
                   Posted on: {formatDate(blog.createdAt)}
                 </p>
-                <p className="blog-author">By: {blog.author.displayName}</p>
+                {/* <p className="blog-author">By: {blog.author.displayName}</p> */}
                 <a href={`/blog/${blog._id}`} className="read-more">
                   Read More
                 </a>
+                <button
+                  onClick={() => summarizeBlog(blog._id, blog.content)}
+                  className="summarize-btn"
+                >
+                  Summarize
+                </button>
+                {summaries[blog._id] && (
+                  <div className="summary-container">
+                    <p className="blog-summary">{summaries[blog._id]}</p>
+                    <button
+                      onClick={() => clearSummary(blog._id)}
+                      className="clear-summary-btn"
+                    >
+                      Clear Summary
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (

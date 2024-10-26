@@ -160,3 +160,38 @@
 .new-post-btn:hover {
   background-color: var(--accent-1);
 }
+
+.summarize-btn,
+.clear-summary-btn {
+  background-color: var(--accent-2);
+  color: var(--secondary-bg);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.clear-summary-btn {
+  background-color: var(--secondary-text);
+  margin-left: 10px;
+}
+
+.summarize-btn:hover,
+.clear-summary-btn:hover {
+  background-color: var(--accent-1);
+}
+
+.summary-container {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+}
+
+.blog-summary {
+  font-style: italic;
+  color: var(--secondary-text);
+  margin-bottom: 10px;
+}

@@ -6,6 +6,7 @@ import session from "express-session";
 import passport from "passport";
 import authRoutes from "./routes/auth.js";
 import blogRoutes from "./routes/blogs.js";
+import aiRoutes from "./routes/summarize.js";
 import "./config/passport.js";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/ai", aiRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)
