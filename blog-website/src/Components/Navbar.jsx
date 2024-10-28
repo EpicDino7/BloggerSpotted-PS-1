@@ -1,10 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import "../StyleSheets/Navbar.css";
 
 const Navbar = ({ showLoginButton }) => {
-  const { user, login, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="navbar">
@@ -21,7 +22,7 @@ const Navbar = ({ showLoginButton }) => {
               Logout
             </button>
           ) : (
-            <button onClick={login} className="navbar-link">
+            <button onClick={() => navigate("/login")} className="navbar-link">
               Login
             </button>
           ))}

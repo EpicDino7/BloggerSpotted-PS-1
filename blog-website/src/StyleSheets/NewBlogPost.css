@@ -63,3 +63,70 @@
 .form-buttons button[type="button"]:hover {
   background-color: var(--primary-text);
 }
+
+.enhancement-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.enhance-btn {
+  background-color: var(--accent-3);
+  color: var(--secondary-bg);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.enhance-btn:disabled {
+  background-color: var(--secondary-text);
+  cursor: not-allowed;
+}
+
+.enhance-btn:hover:not(:disabled) {
+  background-color: var(--accent-2);
+  transform: translateY(-2px);
+}
+
+.revert-btn {
+  background-color: var(--secondary-text);
+  color: var(--secondary-bg);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.revert-btn:hover {
+  background-color: var(--accent-1);
+}
+
+.enhance-btn.enhancing {
+  position: relative;
+  padding-left: 35px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: var(--secondary-bg);
+  border-radius: 50%;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
