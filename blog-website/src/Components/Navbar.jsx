@@ -7,7 +7,6 @@ const Navbar = ({ showLoginButton }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Update the return statement in the Navbar component
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-title">
