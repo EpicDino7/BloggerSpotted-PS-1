@@ -4,6 +4,7 @@ import HomePage from "./Components/HomePage";
 import BlogTopicPage from "./Components/BlogTopicPage";
 import BlogPost from "./Components/BlogPost";
 import Login from "./Components/Login";
+import { Profile } from "./Components/Profile";
 import { AuthProvider } from "./AuthContext";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/topic/:topic" element={<BlogTopicPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/blog/:id" element={<BlogPost />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </AuthProvider>

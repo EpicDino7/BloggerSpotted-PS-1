@@ -47,4 +47,15 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const blogs = await Blog.find({ author: req.params.userId })
+      .populate("author", "displayName")
+      .sort({ createdAt: -1 });
+    res.json(blogs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;

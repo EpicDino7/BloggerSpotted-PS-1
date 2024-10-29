@@ -7,6 +7,7 @@ const Navbar = ({ showLoginButton }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Update the return statement in the Navbar component
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-title">
@@ -18,9 +19,14 @@ const Navbar = ({ showLoginButton }) => {
         </Link>
         {showLoginButton &&
           (user ? (
-            <button onClick={logout} className="navbar-link">
-              Logout
-            </button>
+            <>
+              <Link to="/profile" className="navbar-link">
+                Profile
+              </Link>
+              <button onClick={logout} className="navbar-link">
+                Logout
+              </button>
+            </>
           ) : (
             <button onClick={() => navigate("/login")} className="navbar-link">
               Login
