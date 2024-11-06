@@ -87,10 +87,27 @@
   color: var(--accent-2);
 }
 
+.delete-btn {
+  margin-left: 180px;
+  background-color:white;
+  
+}
+
+.delete-svg{
+  height:20px;
+  width:20px;
+}
+
 .no-blogs-message {
   text-align: center;
   color: var(--secondary-text);
   font-size: 18px;
   grid-column: 1 / -1;
   padding: 40px;
+}
+.delete {
+  
+  height=20px;
+  width=20px;
+
 }

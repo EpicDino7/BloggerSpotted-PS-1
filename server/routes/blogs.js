@@ -58,4 +58,14 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id: blogID } = req.params;
+    const blog = await Blog.findOneAndDelete({ _id: blogID });
+    res.status(200).json({ blog });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;

@@ -22,7 +22,7 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
     if (!content.trim()) return;
 
     setIsEnhancing(true);
-    setOriginalContent(content); // Save original content
+    setOriginalContent(content);
 
     try {
       const response = await axios.post(
