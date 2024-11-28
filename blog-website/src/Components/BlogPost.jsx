@@ -3,6 +3,16 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar";
 import "../StyleSheets/BlogPost.css";
+import {
+  RedditIcon,
+  RedditShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
+  XIcon,
+  TwitterShareButton,
+  LinkedinIcon,
+  LinkedinShareButton,
+} from "react-share";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -23,6 +33,14 @@ const BlogPost = () => {
     }
   };
 
+  const updateBlog = async () => {
+    try {
+      const response = await axios.put(`${API_URL}/blogs/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const formatDate = (dateString) => {
     const options = {
       year: "numeric",
@@ -38,6 +56,9 @@ const BlogPost = () => {
     return <div>Loading...</div>;
   }
 
+  const blogurl = window.location.href;
+  const blogtitle = blog.title;
+  const blogcontent = blog.content;
   return (
     <div className="page-container">
       <Navbar showLoginButton={true} />
@@ -48,6 +69,22 @@ const BlogPost = () => {
             <span className="blog-date">
               Posted on: {formatDate(blog.createdAt)}
             </span>
+            <RedditShareButton url={blogcontent} title={blogtitle}>
+              <RedditIcon size={32} />
+            </RedditShareButton>
+
+            <WhatsappShareButton url={blogcontent} title={blogtitle}>
+              <WhatsappIcon size={32} />
+            </WhatsappShareButton>
+
+            <TwitterShareButton url={blogcontent} title={blogtitle}>
+              <XIcon size={32} />
+            </TwitterShareButton>
+
+            <LinkedinShareButton url={blogcontent} title={blogtitle}>
+              <LinkedinIcon size={32} />
+            </LinkedinShareButton>
+
             {/* {blog.author && (
               <span className="blog-author">By: {blog.author.displayName}</span>
             )} */}

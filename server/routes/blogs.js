@@ -58,6 +58,16 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { id: blogID } = req.params;
+    const blog = await Blog.findByIdAndUpdate(blogID, req.body, { new: true });
+    res.status(200).json({ blog });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.delete("/:id", async (req, res) => {
   try {
     const { id: blogID } = req.params;
