@@ -26,15 +26,12 @@ router.post("/enhance", async (req, res) => {
     Enhanced version:`;
 
     const result = await hf.textGeneration({
-      model: "mistralai/Mistral-7B-Instruct-v0.2",
+      model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
       inputs: prompt,
       parameters: {
-        max_new_tokens: 4096,
+        max_new_tokens: 1000,
         temperature: 0.7,
-        top_p: 0.9,
         repetition_penalty: 1.2,
-        do_sample: true,
-        num_return_sequences: 1,
         return_full_text: false,
       },
     });

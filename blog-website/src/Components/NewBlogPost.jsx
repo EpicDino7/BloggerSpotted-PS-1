@@ -9,6 +9,89 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
   const [content, setContent] = useState("");
   const [originalContent, setOriginalContent] = useState("");
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [generatedBlog, setGeneratedBlog] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleFileSelect = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const clearBlog = (x) => {
+    setContent("");
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select an image first!");
+      return;
+    }
+
+    setIsGenerating(true);
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    try {
+      console.log("Sending image:", selectedFile);
+      const response = await axios.post(`${API_URL}/ai/imageai`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+
+      console.log("Server response:", response.data);
+
+      if (response.data && response.data.blogPost) {
+        setContent(response.data.blogPost);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      alert(
+        `Failed to generate blog: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleEnhanceContent = async () => {
+    // Existing text enhancement logic
+    setIsEnhancing(true);
+    try {
+      const response = await axios.post(
+        `${API_URL}/ai/enhance`,
+        { content },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.data.enhancedContent) {
+        setContent(response.data.enhancedContent);
+      } else {
+        throw new Error("No enhanced content received");
+      }
+    } catch (error) {
+      console.error("Error enhancing content:", error);
+      alert(
+        `Failed to enhance content: ${
+          error.response?.data?.message || "Please try again"
+        }`
+      );
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,53 +99,7 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
     setTitle("");
     setContent("");
     setOriginalContent("");
-  };
-
-  const enhanceContent = async () => {
-    if (!content.trim()) return;
-
-    setIsEnhancing(true);
-    setOriginalContent(content);
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/ai/enhance`,
-        { content },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.data.enhancedContent) {
-        setContent(response.data.enhancedContent);
-      } else {
-        console.error("No enhanced content in response:", response.data);
-        throw new Error("No enhanced content received");
-      }
-    } catch (error) {
-      console.error("Error enhancing content:", error);
-      if (error.response) {
-        console.error("Server error:", error.response.data);
-        alert(
-          `Failed to enhance content: ${
-            error.response.data.message || "Unknown error"
-          }`
-        );
-      } else {
-        alert("Failed to enhance content. Please try again.");
-      }
-    } finally {
-      setIsEnhancing(false);
-    }
-  };
-  const revertContent = () => {
-    if (originalContent) {
-      setContent(originalContent);
-      setOriginalContent("");
-    }
+    setFile(null);
   };
 
   return (
@@ -82,32 +119,56 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
-        <div className="enhancement-buttons">
+
+        <div className="image-upload-section">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="file-input"
+          />
           <button
             type="button"
-            onClick={enhanceContent}
-            disabled={isEnhancing || !content.trim()}
-            className={`enhance-btn ${isEnhancing ? "enhancing" : ""}`}
+            onClick={handleImageUpload}
+            disabled={!selectedFile || isGenerating}
+            className="generate-btn"
           >
-            {isEnhancing ? (
-              <>
-                <span className="spinner"></span>
-                Enhancing...
-              </>
-            ) : (
-              "Enhance with AI"
-            )}
+            {isGenerating ? "Generating..." : "Generate Blog from Image"}
           </button>
-          {originalContent && (
-            <button
-              type="button"
-              onClick={revertContent}
-              className="revert-btn"
-            >
-              Revert Changes
-            </button>
-          )}
         </div>
+
+        {generatedBlog && (
+          <div>
+            <img
+              src={generatedBlog.image}
+              alt="Uploaded"
+              style={{ maxWidth: "300px" }}
+            />
+            <textarea
+              value={generatedBlog.aiGeneratedContent}
+              onChange={(e) =>
+                setGeneratedBlog({
+                  ...generatedBlog,
+                  aiGeneratedContent: e.target.value,
+                })
+              }
+              rows={10}
+              cols={50}
+            />
+          </div>
+        )}
+
+        {/* Existing Text Enhancement Button */}
+        <button
+          type="button"
+          onClick={handleEnhanceContent}
+          disabled={isEnhancing}
+        >
+          {isEnhancing ? "Enhancing..." : "Enhance Content"}
+        </button>
+
+        <button onClick={clearBlog}>Clear</button>
+
         <div className="form-buttons">
           <button type="submit">Post</button>
           <button type="button" onClick={onCancel}>
