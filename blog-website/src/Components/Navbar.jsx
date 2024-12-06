@@ -10,12 +10,9 @@ const Navbar = ({ showLoginButton }) => {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-title">
-        BlogWebsite
+        Blogger Spotted
       </Link>
       <div className="navbar-links">
-        <Link to="/contact" className="navbar-link">
-          Contact
-        </Link>
         {showLoginButton &&
           (user ? (
             <>

@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import "../StyleSheets/Profile.css";
 import NewBlogPost from "./NewBlogPost";
 import EditBlogPost from "./EditBlogPost";
+import { Link } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -32,8 +33,7 @@ export const Profile = () => {
 
   const deleteBlog = async (id) => {
     try {
-      const response = await axios.delete(`${API_URL}/blogs/${id}`);
-      setBlogs(response.data);
+      await axios.delete(`${API_URL}/blogs/${id}`);
       fetchUserBlogs();
     } catch (error) {
       console.error("Error deleting blog: ", error);
@@ -65,7 +65,9 @@ export const Profile = () => {
   };
 
   if (!user) {
-    return <div>Log in bro</div>;
+    return (
+      <div className="no-user-message">Please log in to view your profile.</div>
+    );
   }
 
   return (
@@ -73,13 +75,8 @@ export const Profile = () => {
       <Navbar showLoginButton={true} />
       <div className="profile-content">
         <div className="profile-header">
-          <h1>My Profile</h1>
-          <div className="user-info">
-            <p>Welcome, {user.displayName}</p>
-            <p>{user.email}</p>
-          </div>
+          <h1>Your Profile</h1>
         </div>
-
         <div className="my-blogs-section">
           <h2>Blog Posts</h2>
           <div className="blogs-grid">
@@ -104,15 +101,60 @@ export const Profile = () => {
                   <p className="blog-date">
                     Posted on: {formatDate(blog.createdAt)}
                   </p>
-                  <button onClick={() => deleteBlog(blog._id)}>Delete</button>
-                  <button
-                    className="update"
-                    onClick={() => {
-                      editBlog(blog);
-                    }}
-                  >
-                    Edit
-                  </button>
+                  <Link to={`/blog/${blog._id}`} className="read-more-link">
+                    Read More
+                  </Link>
+                  <div className="button-group">
+                    <button
+                      onClick={() => deleteBlog(blog._id)}
+                      className="delete-button"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-trash"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M3 6h18" />
+                        <path d="M4 6v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                      </svg>
+                      Delete
+                    </button>
+                    <button
+                      className="update-button"
+                      onClick={() => {
+                        editBlog(blog);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-pencil"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3l4.5 4.5-1.5 1.5-4.5-4.5z" />
+                        <path d="M3 21v-6.5L15.5 3l4.5 4.5L7.5 21H3z" />
+                      </svg>
+                      Edit
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (

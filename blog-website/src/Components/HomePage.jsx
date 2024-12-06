@@ -4,22 +4,11 @@ import Navbar from "./Navbar";
 import axios from "axios";
 import "../StyleSheets/HomePage.css";
 
-const DEFAULT_TOPICS = [
-  { name: "Technology", trendingScore: 95 },
-  { name: "Science", trendingScore: 90 },
-  { name: "Art", trendingScore: 85 },
-  { name: "Music", trendingScore: 80 },
-  { name: "Travel", trendingScore: 75 },
-  { name: "Food", trendingScore: 70 },
-  { name: "Lifestyle", trendingScore: 65 },
-  { name: "Health", trendingScore: 60 },
-  { name: "Education", trendingScore: 55 },
-];
-
 const HomePage = () => {
-  const [topics, setTopics] = useState(DEFAULT_TOPICS);
+  const [topics, setTopics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_URL = "http://localhost:5000/api";
 
   useEffect(() => {
     fetchTrendingTopics();
@@ -31,11 +20,11 @@ const HomePage = () => {
         "http://localhost:5000/api/trending/trending-topics",
         { withCredentials: true }
       );
-      console.log("Trending Topics Response:", response.data); // Debug log
+      console.log("Trending Topics Response:", response.data);
       if (response.data && Array.isArray(response.data)) {
         const processedTopics = response.data.map((topic) => ({
           ...topic,
-          name: formatTopicName(topic.name),
+          name: topic.name,
         }));
         setTopics(processedTopics);
         setError(null);
@@ -55,22 +44,6 @@ const HomePage = () => {
     }
   };
 
-  // Function to format news headlines into more suitable topic names
-  const formatTopicName = (headline) => {
-    // Remove any text after certain punctuation marks
-    let topic = headline.split(/[:.,-]/)[0];
-
-    // Remove common news-specific phrases
-    topic = topic.replace(/breaking|exclusive|report|update|news/gi, "");
-
-    // Limit to first 5 words for readability
-    topic = topic.split(" ").slice(0, 5).join(" ");
-
-    // Trim whitespace and ensure first letter is capitalized
-    topic = topic.trim();
-    return topic.charAt(0).toUpperCase() + topic.slice(1);
-  };
-
   if (loading) {
     return (
       <div className="page-container">
@@ -84,7 +57,7 @@ const HomePage = () => {
 
   return (
     <div className="page-container">
-      <Navbar showLoginButton={false} />
+      <Navbar showLoginButton={true} />
       <div className="homepage-content">
         <h1 className="trending-title">Trending Topics This Week</h1>
         {error && <div className="error-message">{error}</div>}
@@ -102,9 +75,6 @@ const HomePage = () => {
             >
               <div className="topic-content">
                 <span className="topic-name">{topic.name}</span>
-                <span className="trending-score">
-                  Trending Score: {topic.trendingScore}
-                </span>
               </div>
             </Link>
           ))}

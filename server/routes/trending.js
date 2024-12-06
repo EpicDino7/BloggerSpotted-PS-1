@@ -6,92 +6,137 @@ import dotenv from "dotenv";
 dotenv.config();
 const router = express.Router();
 
-// Get current trending topics
 router.get("/trending-topics", async (req, res) => {
   try {
     const currentDate = new Date();
-    const currentWeek = getWeekNumber(currentDate);
+    const currentHour = currentDate.getHours();
+    const intervalHours = 2;
+    const interval = Math.floor(currentHour / intervalHours);
     const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
 
-    console.log(`Fetching topics for week ${currentWeek}, year ${currentYear}`); // Debug log
+    console.log(`Fetching topics for interval ${interval} on ${currentDate}`);
+
+    if (!process.env.NEWSDATA_API_KEY) {
+      throw new Error("NewsData API key is missing");
+    }
 
     let trendingTopics = await TrendingTopic.findOne({
-      weekNumber: currentWeek,
       year: currentYear,
-    });
+      month: currentMonth,
+      day: currentDay,
+      interval: interval,
+    }).sort({ createdAt: -1 });
 
     if (!trendingTopics) {
-      console.log("No existing topics found, fetching from News API..."); // Debug log
-      try {
-        trendingTopics = await fetchTrendingTopicsFromNewsAPI(
-          currentWeek,
-          currentYear
-        );
-        console.log("New topics fetched successfully"); // Debug log
-      } catch (fetchError) {
-        console.error("Error fetching topics from News API:", fetchError);
-        // Use fallback topics
-        trendingTopics = await new TrendingTopic({
-          topics: [
-            { name: "Artificial Intelligence", trendingScore: 95 },
-            { name: "Climate Change", trendingScore: 90 },
-            { name: "Digital Privacy", trendingScore: 85 },
-            { name: "Mental Health", trendingScore: 80 },
-            { name: "Space Exploration", trendingScore: 75 },
-            { name: "Sustainable Living", trendingScore: 70 },
-            { name: "Remote Work", trendingScore: 65 },
-            { name: "Blockchain", trendingScore: 60 },
-            { name: "Renewable Energy", trendingScore: 55 },
-          ],
-          weekNumber: currentWeek,
-          year: currentYear,
-        }).save();
+      console.log(
+        "No topics found for current interval, fetching from NewsData API..."
+      );
+
+      const firstResponse = await axios.get("https://newsdata.io/api/1/news", {
+        params: {
+          apikey: process.env.NEWSDATA_API_KEY,
+          country: "us",
+          language: "en",
+          size: 9,
+        },
+      });
+
+      let allArticles = [];
+
+      if (firstResponse.data && firstResponse.data.results) {
+        allArticles = [...firstResponse.data.results];
       }
-    } else {
-      console.log("Found existing topics for current week"); // Debug log
+
+      if (!allArticles.length) {
+        throw new Error("No articles received from NewsData API");
+      }
+
+      const uniqueArticles = allArticles
+        .filter((article) => article.title && article.title.trim().length > 0)
+        .reduce((acc, current) => {
+          const formattedTitle = formatTopicTitle(current.title);
+          const titleExists = acc.find(
+            (item) => formatTopicTitle(item.title) === formattedTitle
+          );
+          if (!titleExists && formattedTitle.length > 0) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+
+      console.log(
+        `Found ${uniqueArticles.length} unique articles after filtering`
+      );
+
+      const topics = uniqueArticles
+        .slice(0, 9)
+        .map((article, index) => ({
+          name: formatTopicTitle(article.title),
+          fullTitle: article.title,
+          description: article.description || "",
+          content: article.content || "",
+          link: article.link || "",
+          trendingScore: 100 - index * 10,
+        }))
+        .filter((topic) => topic.name.length > 0);
+
+      if (topics.length === 9) {
+        trendingTopics = new TrendingTopic({
+          topics,
+          year: currentYear,
+          month: currentMonth,
+          day: currentDay,
+          interval: interval,
+          createdAt: new Date(),
+        });
+
+        await trendingTopics.save();
+        console.log(
+          `Created new entry with ${topics.length} topics for interval ${interval}`
+        );
+        return res.json(topics);
+      } else {
+        throw new Error(`Unable to get 9 unique topics (got ${topics.length})`);
+      }
     }
 
     res.json(trendingTopics.topics);
   } catch (error) {
-    console.error("Server error in trending-topics:", error);
-    res.status(500).json({
-      message: "Error fetching trending topics",
-      error: error.message,
+    console.error("NewsData API Error:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
     });
+    res.status(500).json({ error: error.message });
   }
 });
 
-async function fetchTrendingTopicsFromNewsAPI(weekNumber, year) {
-  try {
-    const response = await axios.get("https://newsapi.org/v2/top-headlines", {
-      params: {
-        apiKey: process.env.NEWS_API_KEY,
-        country: "us", // You can change this to your preferred country
-        category: "general", // You can change this to your preferred category
-        pageSize: 9, // Limit to 9 topics
-      },
-    });
+function formatTopicTitle(title) {
+  if (!title) return "";
 
-    console.log("News API Response:", response.data); // Debug log
+  let fullSentence = title
+    .replace(/[\[\](){}]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-    const articles = response.data.articles;
-    const topics = articles.map((article, index) => ({
-      name: article.title,
-      trendingScore: 100 - index * 10, // Assign a trending score based on position
-    }));
+  let sentences = fullSentence.split(/(?<=[.!?])\s+/);
+  let mainSentence = sentences[0];
 
-    const newTrendingTopics = new TrendingTopic({
-      topics,
-      weekNumber,
-      year,
-    });
-
-    await newTrendingTopics.save();
-    return newTrendingTopics;
-  } catch (error) {
-    console.error("Error fetching from News API:", error);
-    throw error;
+  if (sentences.length > 1 && mainSentence.split(" ").length < 10) {
+    mainSentence = sentences.slice(0, 2).join(" ");
   }
+
+  let words = mainSentence.split(" ").filter((word) => word.length > 0);
+
+  words = words.slice(0, Math.max(15, Math.min(10, words.length)));
+
+  let finalTitle = words.join(" ");
+
+  finalTitle = finalTitle.charAt(0).toUpperCase() + finalTitle.slice(1);
+
+  return finalTitle;
 }
 
 function getWeekNumber(date) {

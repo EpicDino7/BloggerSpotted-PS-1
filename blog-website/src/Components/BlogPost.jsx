@@ -59,12 +59,15 @@ const BlogPost = () => {
   const blogurl = window.location.href;
   const blogtitle = blog.title;
   const blogcontent = blog.content;
+  const blogtopic = blog.topic;
+
   return (
     <div className="page-container">
       <Navbar showLoginButton={true} />
       <div className="blog-post-content">
         <article className="blog-post">
           <h1 className="blog-title">{blog.title}</h1>
+          <h2 className="blog-topic">Topic: {blogtopic}</h2>
           <div className="blog-metadata">
             <span className="blog-date">
               Posted on: {formatDate(blog.createdAt)}

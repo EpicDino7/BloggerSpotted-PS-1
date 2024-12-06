@@ -36,6 +36,8 @@ router.post("/enhance", async (req, res) => {
       },
     });
 
+    console.log(result);
+
     const enhancedContent = result.generated_text.replace(prompt, "").trim();
 
     if (!enhancedContent) {

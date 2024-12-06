@@ -64,7 +64,6 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
   };
 
   const handleEnhanceContent = async () => {
-    // Existing text enhancement logic
     setIsEnhancing(true);
     try {
       const response = await axios.post(
@@ -158,7 +157,6 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
           </div>
         )}
 
-        {/* Existing Text Enhancement Button */}
         <button
           type="button"
           onClick={handleEnhanceContent}
