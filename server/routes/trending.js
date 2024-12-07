@@ -37,7 +37,7 @@ router.get("/trending-topics", async (req, res) => {
       const firstResponse = await axios.get("https://newsdata.io/api/1/news", {
         params: {
           apikey: process.env.NEWSDATA_API_KEY,
-          country: "us",
+          country: "us,in,gb",
           language: "en",
           size: 9,
         },
