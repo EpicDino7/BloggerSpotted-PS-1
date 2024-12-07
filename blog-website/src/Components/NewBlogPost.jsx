@@ -77,7 +77,9 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
       );
 
       if (response.data.enhancedContent) {
-        setContent(response.data.enhancedContent);
+        const { enhancedTitle, enhancedBody } = response.data.enhancedContent;
+        setTitle(enhancedTitle);
+        setContent(enhancedBody);
       } else {
         throw new Error("No enhanced content received");
       }
