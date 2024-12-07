@@ -65,6 +65,7 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
 
   const handleEnhanceContent = async () => {
     setIsEnhancing(true);
+    setOriginalContent(content);
     try {
       const response = await axios.post(
         `${API_URL}/ai/enhance`,
@@ -89,6 +90,13 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
       );
     } finally {
       setIsEnhancing(false);
+    }
+  };
+
+  const revertContent = () => {
+    if (originalContent) {
+      setContent(originalContent);
+      setOriginalContent("");
     }
   };
 
@@ -164,6 +172,12 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
         >
           {isEnhancing ? "Enhancing..." : "Enhance Content"}
         </button>
+
+        {originalContent && (
+          <button type="button" onClick={revertContent} className="revert-btn">
+            Revert Changes
+          </button>
+        )}
 
         <button onClick={clearBlog}>Clear</button>
 
