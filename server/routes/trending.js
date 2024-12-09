@@ -10,8 +10,8 @@ router.get("/trending-topics", async (req, res) => {
   try {
     const currentDate = new Date();
     const currentHour = currentDate.getHours();
-    const intervalHours = 5;
-    const interval = Math.floor(currentHour / intervalHours);
+
+    const interval = 2;
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
     const currentDay = currentDate.getDate();
@@ -37,7 +37,7 @@ router.get("/trending-topics", async (req, res) => {
       const firstResponse = await axios.get("https://newsdata.io/api/1/news", {
         params: {
           apikey: process.env.NEWSDATA_API_KEY,
-          country: "wo,us,in,gb,ch",
+          country: "wo,us,in",
           language: "en",
           size: 9,
         },
@@ -47,6 +47,24 @@ router.get("/trending-topics", async (req, res) => {
 
       if (firstResponse.data && firstResponse.data.results) {
         allArticles = [...firstResponse.data.results];
+      }
+
+      if (allArticles.length < 9) {
+        const secondResponse = await axios.get(
+          "https://newsdata.io/api/1/news",
+          {
+            params: {
+              apikey: process.env.NEWSDATA_API_KEY,
+              country: "gb,ca,au",
+              language: "en",
+              size: 9 - firstResponse.size,
+            },
+          }
+        );
+
+        if (secondResponse.data && secondResponse.data.results) {
+          allArticles = [...allArticles, ...secondResponse.data.results];
+        }
       }
 
       if (!allArticles.length) {
@@ -137,12 +155,6 @@ function formatTopicTitle(title) {
   finalTitle = finalTitle.charAt(0).toUpperCase() + finalTitle.slice(1);
 
   return finalTitle;
-}
-
-function getWeekNumber(date) {
-  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-  const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
 export default router;

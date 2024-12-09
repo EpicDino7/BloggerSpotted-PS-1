@@ -11,7 +11,6 @@
   --button-padding: 10px 16px;
   --border-radius: 8px;
 
-  /* New gradient colors */
   --gradient-start: #6a11cb;
   --gradient-end: #2575fc;
 }
@@ -21,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 50px;
-  position: relative; /* Added to position the button absolutely */
+  position: relative;
 }
 
 .profile-header h1:first-child {
@@ -65,8 +64,6 @@
 .new-post-button:hover {
   background-color: var(--accent-hover);
 }
-
-/* ... (rest of the original CSS remains unchanged) */
 
 .blogs-grid {
   display: grid;
@@ -136,6 +133,13 @@
   gap: 10px;
 }
 
+.button-group {
+  display: flex;
+  gap: 140px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
 .edit-button,
 .delete-button {
   background: none;
@@ -150,13 +154,13 @@
 }
 
 .edit-button {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
+  border-color: #ffcc00;
+  color: #ffcc00;
 }
 
 .edit-button:hover {
-  background-color: var(--accent-hover);
-  color: white;
+  background-color: #ffcc00;
+  color: #ffcc00;
 }
 
 .delete-button {
@@ -174,4 +178,28 @@
   text-align: center;
   color: var(--secondary-text);
   padding: 20px;
+}
+
+.summarize-btn {
+  background-color: var(--accent-2);
+  color: var(--secondary-bg);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+.summarize-btn:hover {
+  background-color: var(--accent-1);
+  transform: translateY(-2px);
+}
+
+.summarize-btn:disabled {
+  background-color: var(--secondary-text);
+  cursor: not-allowed;
 }

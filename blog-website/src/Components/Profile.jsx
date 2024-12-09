@@ -15,6 +15,8 @@ export const Profile = () => {
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const [showEditPostForm, setShowEditPostForm] = useState(false);
   const [currentBlog, setCurrentBlog] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summaries, setSummaries] = useState({});
 
   useEffect(() => {
     if (user) {
@@ -29,6 +31,28 @@ export const Profile = () => {
     } catch (error) {
       console.error("Error fetching user blogs:", error);
     }
+  };
+
+  const summarizeBlog = async (blogId, content) => {
+    try {
+      const response = await axios.post(`${API_URL}/ai/summarize`, {
+        text: content,
+      });
+      setSummaries((prev) => ({
+        ...prev,
+        [blogId]: response.data.summary,
+      }));
+    } catch (error) {
+      console.error("Error summarizing blog:", error);
+    }
+  };
+
+  const clearSummary = (blogId) => {
+    setSummaries((prev) => {
+      const newSummaries = { ...prev };
+      delete newSummaries[blogId];
+      return newSummaries;
+    });
   };
 
   const deleteBlog = async (id) => {
@@ -155,6 +179,27 @@ export const Profile = () => {
                       Edit
                     </button>
                   </div>
+                  <button
+                    onClick={async () => {
+                      setLoadingSummary(true);
+                      await summarizeBlog(blog._id, blog.content);
+                      setLoadingSummary(false);
+                    }}
+                    className="summarize-btn"
+                  >
+                    Summarize
+                  </button>
+                  {summaries[blog._id] && (
+                    <div className="summary-container">
+                      <p className="blog-summary">{summaries[blog._id]}</p>
+                      <button
+                        onClick={() => clearSummary(blog._id)}
+                        className="clear-summary-btn"
+                      >
+                        Clear Summary
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

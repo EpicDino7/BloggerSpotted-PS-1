@@ -15,6 +15,7 @@ const BlogTopicPage = () => {
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { user } = useAuth();
   const [summaries, setSummaries] = useState({});
+  const [loadingSummary, setLoadingSummary] = useState(false);
 
   const API_URL = "http://localhost:5000/api";
 
@@ -138,9 +139,7 @@ const BlogTopicPage = () => {
           </button>
         </div>
 
-        {currentTopic?.description && (
-          <p className="full-topic-description">{currentTopic.description}</p>
-        )}
+        <p className="full-topic-description">{currentTopic.description}</p>
 
         {showNewPostForm && (
           <NewBlogPost
@@ -171,7 +170,11 @@ const BlogTopicPage = () => {
                     Read More
                   </Link>
                   <button
-                    onClick={() => summarizeBlog(blog._id, blog.content)}
+                    onClick={async () => {
+                      setLoadingSummary(true);
+                      await summarizeBlog(blog._id, blog.content);
+                      setLoadingSummary(false);
+                    }}
                     className="summarize-btn"
                   >
                     Summarize
