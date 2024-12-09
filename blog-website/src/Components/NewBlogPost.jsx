@@ -19,6 +19,7 @@ const NewBlogPost = ({ onSubmit, onCancel }) => {
 
   const clearBlog = (x) => {
     setContent("");
+    setTitle("");
   };
 
   const handleImageUpload = async () => {
