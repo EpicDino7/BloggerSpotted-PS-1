@@ -6,12 +6,8 @@ import "../StyleSheets/BlogPost.css";
 import {
   RedditIcon,
   RedditShareButton,
-  WhatsappIcon,
-  WhatsappShareButton,
   XIcon,
   TwitterShareButton,
-  LinkedinIcon,
-  LinkedinShareButton,
 } from "react-share";
 
 const API_URL = "http://localhost:5000/api";
@@ -76,17 +72,9 @@ const BlogPost = () => {
               <RedditIcon size={32} />
             </RedditShareButton>
 
-            <WhatsappShareButton url={blogcontent} title={blogtitle}>
-              <WhatsappIcon size={32} />
-            </WhatsappShareButton>
-
             <TwitterShareButton url={blogcontent} title={blogtitle}>
               <XIcon size={32} />
             </TwitterShareButton>
-
-            <LinkedinShareButton url={blogcontent} title={blogtitle}>
-              <LinkedinIcon size={32} />
-            </LinkedinShareButton>
 
             {/* {blog.author && (
               <span className="blog-author">By: {blog.author.displayName}</span>
