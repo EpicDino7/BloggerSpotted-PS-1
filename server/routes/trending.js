@@ -11,7 +11,7 @@ router.get("/trending-topics", async (req, res) => {
     const currentDate = new Date();
     const currentHour = currentDate.getHours();
 
-    const interval = 5;
+    const interval = 24;
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
     const currentDay = currentDate.getDate();
@@ -37,7 +37,7 @@ router.get("/trending-topics", async (req, res) => {
       const firstResponse = await axios.get("https://newsdata.io/api/1/news", {
         params: {
           apikey: process.env.NEWSDATA_API_KEY,
-          country: "wo",
+          country: "in",
           language: "en",
           size: 9,
         },
@@ -55,7 +55,7 @@ router.get("/trending-topics", async (req, res) => {
           {
             params: {
               apikey: process.env.NEWSDATA_API_KEY,
-              country: "us,in,gb,ca,au",
+              country: "wo,us,gb,ca,au",
               language: "en",
               size: 9 - firstResponse.size,
             },
